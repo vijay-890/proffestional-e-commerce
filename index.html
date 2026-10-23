@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A responsive sample boutique with category filters and a demo shopping bag.">
+  <title>Atelier — Modern Essentials</title>
+  <style>
+    :root { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #242722; background: #f6f5f1; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px max(5vw, 20px); background: #f6f5f1ee; backdrop-filter: blur(12px); border-bottom: 1px solid #deded7; }
+    .brand { color: #242722; text-decoration: none; font-size: 1.15rem; font-weight: 900; letter-spacing: .18em; }
+    .actions { display: flex; gap: 9px; align-items: center; }
+    input { width: 210px; padding: 10px 12px; border: 1px solid #d0d1c9; border-radius: 999px; background: white; font: inherit; }
+    button { border: 1px solid #242722; border-radius: 999px; padding: 10px 16px; background: #242722; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    button:hover { background: #536148; border-color: #536148; }
+    main { width: min(1160px, calc(100% - 36px)); margin: auto; }
+    .hero { min-height: 360px; display: flex; align-items: center; margin: 28px 0; padding: clamp(25px, 6vw, 60px); border-radius: 20px; background: radial-gradient(circle at 82% 30%, #e9d6bd 0 12%, transparent 30%), linear-gradient(120deg, #e4e8df, #d0d8ca); }
+    .hero-copy { max-width: 550px; }
+    .eyebrow { font-size: .75rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #627055; }
+    h1 { margin: 12px 0; font-size: clamp(2.5rem, 6vw, 4.6rem); line-height: 1.02; letter-spacing: -.05em; }
+    .hero p { color: #555d4f; line-height: 1.7; }
+    .content { display: grid; grid-template-columns: 1fr 290px; align-items: start; gap: 24px; margin: 36px 0 65px; }
+    .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+    h2 { margin: 0; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .filter { border-color: #b9beb2; background: transparent; color: #353b32; }
+    .filter[aria-pressed="true"] { background: #536148; border-color: #536148; color: white; }
+    .products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .product { overflow: hidden; border-radius: 15px; background: white; border: 1px solid #e5e5df; }
+    .art { display: grid; place-items: center; height: 185px; font-size: 3.5rem; background: linear-gradient(145deg, #ded8c8, #f2ece0); }
+    .product:nth-child(3n) .art { background: linear-gradient(145deg, #cbd5cb, #f0e5da); }
+    .product:nth-child(3n + 2) .art { background: linear-gradient(145deg, #d8d5e2, #f1e9de); }
+    .details { padding: 14px; }
+    .category { color: #74806d; font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .details h3 { margin: 5px 0; }
+    .price { margin: 8px 0 12px; font-weight: 800; }
+    .details button { width: 100%; }
+    .bag { position: sticky; top: 92px; padding: 18px; border: 1px solid #dfe1da; border-radius: 16px; background: white; }
+    .bag h2 { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; }
+    .bag-items { display: grid; gap: 10px; margin: 16px 0; }
+    .bag-item { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #ecece7; font-size: .87rem; }
+    .remove { border: 0; padding: 0; background: none; color: #876252; font-size: .8rem; }
+    .subtotal { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid #dfe1da; font-weight: 800; }
+    .checkout { width: 100%; }
+    .note { min-height: 1.4em; color: #536148; font-size: .86rem; }
+    footer { padding: 25px; text-align: center; color: #697166; border-top: 1px solid #deded7; }
+    @media (max-width: 840px) { .content { grid-template-columns: 1fr; } .bag { position: static; grid-row: 1; } }
+    @media (max-width: 620px) { header { flex-wrap: wrap; } .actions { width: 100%; } input { flex: 1; min-width: 0; } .products { grid-template-columns: 1fr; } .hero { min-height: 300px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="#top">ATELIER</a>
+    <div class="actions">
+      <label><span class="sr-only">Search products</span><input id="search" type="search" placeholder="Search essentials"></label>
+      <button type="button" id="bag-jump">Bag · <span id="bag-count">0</span></button>
+    </div>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Thoughtful everyday pieces</span>
+        <h1>Modern essentials, made simple.</h1>
+        <p>A responsive storefront demo with category filters and a sample bag. Browse the pieces and try the controls.</p>
+      </div>
+    </section>
+    <p class="eyebrow">Sample products · front-end demo only</p>
+    <div class="content">
+      <section aria-labelledby="collection-title">
+        <div class="toolbar"><h2 id="collection-title">The collection</h2></div>
+        <div class="filters" role="group" aria-label="Filter products by category">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter" type="button" data-filter="wear" aria-pressed="false">Wear</button>
+          <button class="filter" type="button" data-filter="home" aria-pressed="false">Home</button>
+          <button class="filter" type="button" data-filter="accessories" aria-pressed="false">Accessories</button>
+        </div>
+        <div class="products" id="products"></div>
+        <p id="empty-state" hidden>No products match this selection.</p>
+      </section>
+      <aside class="bag" id="bag" aria-labelledby="bag-title">
+        <h2 id="bag-title">Your bag <span id="bag-count-label">0 items</span></h2>
+        <div class="bag-items" id="bag-items"><p class="note">Your bag is empty.</p></div>
+        <div class="subtotal"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+        <button class="checkout" type="button" id="checkout">Continue</button>
+        <p class="note" id="bag-note">Sample bag only. No payment is taken.</p>
+      </aside>
+    </div>
+  </main>
+  <footer>ATELIER · E-commerce practice project</footer>
+  <script>
+    const items = [
+      {id:1,name:"Relaxed Linen Shirt",category:"wear",price:1890,icon:"👕"},
+      {id:2,name:"Everyday Tote",category:"accessories",price:790,icon:"👜"},
+      {id:3,name:"Stoneware Cup",category:"home",price:490,icon:"☕"},
+      {id:4,name:"Soft Cotton Throw",category:"home",price:1590,icon:"🧺"},
+      {id:5,name:"Canvas Cap",category:"accessories",price:650,icon:"🧢"},
+      {id:6,name:"Classic Overshirt",category:"wear",price:2290,icon:"🧥"}
+    ];
+    const bag = [];
+    let selectedCategory = "all";
+    const products = document.querySelector("#products");
+    function renderProducts() {
+      const query = document.querySelector("#search").value.trim().toLowerCase();
+      const shown = items.filter((item) => (selectedCategory === "all" || item.category === selectedCategory) && item.name.toLowerCase().includes(query));
+      products.replaceChildren();
+      shown.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "product";
+        const art = document.createElement("div");
+        art.className = "art";
+        art.setAttribute("aria-hidden", "true");
+        art.textContent = item.icon;
+        const detail = document.createElement("div");
+        detail.className = "details";
+        const category = document.createElement("span");
+        category.className = "category";
+        category.textContent = item.category;
+        const name = document.createElement("h3");
+        name.textContent = item.name;
+        const price = document.createElement("p");
+        price.className = "price";
+        price.textContent = "₹" + item.price.toLocaleString("en-IN");
+        const add = document.createElement("button");
+        add.type = "button";
+        add.textContent = "Add to bag";
+        add.addEventListener("click", () => { bag.push(item); renderBag(); });
+        detail.append(category, name, price, add);
+        card.append(art, detail);
+        products.append(card);
+      });
+      document.querySelector("#empty-state").hidden = shown.length > 0;
+    }
+    function renderBag() {
+      const list = document.querySelector("#bag-items");
+      list.replaceChildren();
+      if (bag.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "note";
+        empty.textContent = "Your bag is empty.";
+        list.append(empty);
+      }
+      bag.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "bag-item";
+        const label = document.createElement("span");
+        label.textContent = item.name + " · ₹" + item.price.toLocaleString("en-IN");
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", () => { bag.splice(index, 1); renderBag(); });
+        row.append(label, remove);
+        list.append(row);
+      });
+      const total = bag.reduce((sum, item) => sum + item.price, 0);
+      document.querySelector("#bag-count").textContent = String(bag.length);
+      document.querySelector("#bag-count-label").textContent = bag.length + (bag.length === 1 ? " item" : " items");
+      document.querySelector("#subtotal").textContent = "₹" + total.toLocaleString("en-IN");
+    }
+    document.querySelectorAll("[data-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        selectedCategory = button.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach((filter) => filter.setAttribute("aria-pressed", String(filter === button)));
+        renderProducts();
+      });
+    });
+    document.querySelector("#search").addEventListener("input", renderProducts);
+    document.querySelector("#bag-jump").addEventListener("click", () => document.querySelector("#bag").scrollIntoView({behavior:"smooth",block:"center"}));
+    document.querySelector("#checkout").addEventListener("click", () => {
+      document.querySelector("#bag-note").textContent = bag.length ? "Demo only: connect a secure payment service to accept real orders." : "Add an item before continuing.";
+    });
+    renderProducts();
+    renderBag();
+  </script>
+</body>
+</html>
